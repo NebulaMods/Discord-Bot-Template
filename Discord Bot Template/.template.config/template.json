@@ -1,0 +1,15 @@
+{
+	"$schema": "http://json.schemastore.org/template",
+	"author": "nebula",
+	"classifications": [ "Console", "Linux", "Windows" ],
+	"identity": "DiscordBotTemplate",
+	"name": "Discord Bot Template",
+	"description": "An async Discord bot using the Discord.Net library, setup with efcore for dependancy injection.",
+	"shortName": "discordbottemplate",
+	"sourceName": "DiscordBotTemplate",
+	"tags": {
+		"language": "C#",
+		"type": "project"
+	},
+	"preferNameDirectory": true
+}
