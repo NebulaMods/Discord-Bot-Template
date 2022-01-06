@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using DiscordBotTemplate.Database;
+using DiscordBotTemplate.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,6 +31,7 @@ internal class StartupService
         var provider = services.BuildServiceProvider();
         await new DatabaseContext().Database.MigrateAsync();
         provider.GetRequiredService<LogService>();
+        await provider.GetRequiredService<InteractionHandler>().InitializeAsync();
         await _client.LoginAsync(TokenType.Bot, "token");
         await _client.StartAsync();
         await Task.Delay(Timeout.Infinite);
@@ -41,6 +43,7 @@ internal class StartupService
         .AddSingleton(_client)
         .AddSingleton<LogService>()
         .AddSingleton(new Random())
+        .AddSingleton<InteractionHandler>()
         .AddSingleton(new HttpClient())
         .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordShardedClient>(), new InteractionServiceConfig
         {

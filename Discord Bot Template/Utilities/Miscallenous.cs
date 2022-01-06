@@ -1,12 +1,11 @@
 ﻿using Discord;
 
-namespace DiscordBotTemplate.Utilities
+namespace DiscordBotTemplate.Utilities;
+
+internal class Miscallenous
 {
-    internal class Miscallenous
+    internal static Color RandomDiscordColour()
     {
-        public static Color RandomDiscordColour()
-        {
-            return new Color(new Random().Next(0, 255), new Random().Next(0, 255), new Random().Next(0, 255));
-        }
+        return new Color(new Random().Next(0, 255), new Random().Next(0, 255), new Random().Next(0, 255));
     }
 }

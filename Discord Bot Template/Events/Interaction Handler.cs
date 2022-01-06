@@ -11,13 +11,13 @@ internal class InteractionHandler
     private readonly DiscordShardedClient _client;
     private readonly InteractionService _commands;
     private readonly IServiceProvider _services;
-    public InteractionHandler(DiscordShardedClient discord, InteractionService interactionService, IServiceProvider service)
+    internal InteractionHandler(DiscordShardedClient discord, InteractionService interactionService, IServiceProvider service)
     {
         _client = discord;
         _commands = interactionService;
         _services = service;
     }
-    public async Task InitializeAsync()
+    internal async Task InitializeAsync()
     {
         // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
         var modules = await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
@@ -60,7 +60,7 @@ internal class InteractionHandler
                             message = arg3.ErrorReason,
                         };
                         await database.AddAsync(entry);
-                        await database.SaveChangesAsync();
+                        await database.ApplyChangesAsync();
                     };
                     await arg2.ReplyWithEmbedAsync("Error Occured", arg3.ErrorReason, 60);
                     break;
@@ -126,7 +126,7 @@ internal class InteractionHandler
                             location = arg1.Name,
                             message = arg3.ErrorReason
                         };
-                        await database.AddAsync(entry);
+                        await database.ApplyChangesAsync(entry);
                         await database.SaveChangesAsync();
                     };
                     await arg2.ReplyWithEmbedAsync("Error Occured", arg3.ErrorReason, 60);

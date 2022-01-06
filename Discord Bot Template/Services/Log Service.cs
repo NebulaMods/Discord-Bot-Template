@@ -6,7 +6,7 @@ namespace DiscordBotTemplate.Services;
 internal class LogService
 {
     private readonly DiscordShardedClient _discord;
-    public LogService(DiscordShardedClient discord)
+    internal LogService(DiscordShardedClient discord)
     {
         _discord = discord;
         _discord.Log += Logger;
