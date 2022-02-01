@@ -1,17 +1,17 @@
 ﻿using Discord;
 using Discord.WebSocket;
 
-namespace DiscordBotTemplate.Services;
+namespace DiscordBotTemplate.Loggers;
 
-internal class LogService
+internal class DiscordLogger
 {
-    private readonly DiscordShardedClient _discord;
-    internal LogService(DiscordShardedClient discord)
+    private readonly DiscordShardedClient _client;
+    internal DiscordLogger(DiscordShardedClient client)
     {
-        _discord = discord;
-        _discord.Log += Logger;
+        _client = client;
+        _client.Log += ExecuteLogger;
     }
-    private static Task Logger(LogMessage message)
+    private static Task ExecuteLogger(LogMessage message)
     {
         switch (message.Severity)
         {
