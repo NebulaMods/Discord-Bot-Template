@@ -5,6 +5,30 @@ namespace DiscordBotTemplate.Utilities.Extensions;
 
 internal static class DiscordExtensions
 {
+    private static Embed MainEmbed(string title, string description, string footer, string footerIcon, string url, string imageUrl, List<EmbedFieldBuilder>? embeds = null)
+    {
+        var embed = new EmbedBuilder()
+        {
+            Title = title,
+            Color = Miscallenous.RandomDiscordColour(),
+            Author = new EmbedAuthorBuilder
+            {
+                Url = "https://nebulamods.ca",
+                Name = "Nebula",
+                IconUrl = "https://nebulamods.ca/logo-nebulamods.png"
+            },
+            Footer = new EmbedFooterBuilder
+            {
+                Text = footer,
+                IconUrl = footerIcon
+            },
+            Description = description,
+            Url = url,
+            ThumbnailUrl = imageUrl,
+        }.WithCurrentTimestamp();
+        return embeds is not null ? embed.WithFields(embeds).Build() : embed.Build();
+    }
+
     internal static async Task ReplyWithEmbedAsync(this IInteractionContext context, string title, string description, string url = "", string imageUrl = "", List<EmbedFieldBuilder>? embeds = null, int? deleteTimer = null, bool invisible = false)
     {
         if (context is not ShardedInteractionContext shardedContext)
@@ -12,29 +36,7 @@ internal static class DiscordExtensions
             throw new ArgumentNullException(nameof(shardedContext), "Failed to convert context to a sharded context.");
         }
 
-        var embed = new EmbedBuilder()
-        {
-            Title = title,
-            Color = Miscallenous.RandomDiscordColour(),
-            Author = new EmbedAuthorBuilder
-            {
-                Url = "",
-                Name = "",
-                IconUrl = ""
-            },
-            Footer = new EmbedFooterBuilder
-            {
-                Text = $"Issued by: {context.User.Username} | {context.User.Id}",
-                IconUrl = context.User.GetAvatarUrl()
-            },
-            Description = description,
-            Url = url,
-            ThumbnailUrl = imageUrl,
-        }.WithCurrentTimestamp().Build();
-        if (embeds is not null)
-        {
-            embed = embed.ToEmbedBuilder().WithFields(embeds).Build();
-        }
+        var embed = MainEmbed(title, description, $"Issued by: {context.User.Username} | {context.User.Id}", context.User.GetAvatarUrl(), url, imageUrl, embeds);
 
         if (shardedContext.Interaction.HasResponded)
         {
@@ -49,54 +51,33 @@ internal static class DiscordExtensions
         {
             if (deleteTimer is not null && invisible is false)
             {
-                _ = Task.Run(() =>
+                _ = Task.Run(async () =>
                 {
-                    Thread.Sleep(TimeSpan.FromSeconds((int)deleteTimer));
-                    var msg = context.Interaction.GetOriginalResponseAsync().Result;
-                    msg?.DeleteAsync();
+                    await Task.Delay(TimeSpan.FromSeconds((int)deleteTimer));
+                    await context.Interaction.DeleteOriginalResponseAsync();
                 });
             }
         }
         catch { }
     }
-    internal static async Task SendEmbedAsync(this IChannel channel, string title, string description, string footer, string footerIcon, List<EmbedFieldBuilder>? embeds = null, int? deleteTimer = null)
+    internal static async Task SendEmbedAsync(this IChannel channel, string title, string description, string footer, string footerIcon, string url, string imageUrl, List<EmbedFieldBuilder>? embeds = null, int? deleteTimer = null)
     {
         if (channel is not ITextChannel textChannel)
         {
             throw new ArgumentNullException(nameof(textChannel), "Channel was not a text channel");
         }
 
-        var embed = new EmbedBuilder()
-        {
-            Title = title,
-            Color = Miscallenous.RandomDiscordColour(),
-            Author = new EmbedAuthorBuilder
-            {
-                Url = "",
-                Name = "",
-                IconUrl = ""
-            },
-            Footer = new EmbedFooterBuilder
-            {
-                Text = footer,
-                IconUrl = footerIcon
-            },
-            Description = description,
-        }.WithCurrentTimestamp().Build();
-        if (embeds is not null)
-        {
-            embed = embed.ToEmbedBuilder().WithFields(embeds).Build();
-        }
+        var embed = MainEmbed(title, description, footer, footerIcon, url, imageUrl, embeds);
 
         IUserMessage msg = await textChannel.SendMessageAsync(embed: embed);
         try
         {
             if (deleteTimer is not null && msg is not null)
             {
-                _ = Task.Run(() =>
+                _ = Task.Run(async () =>
                 {
-                    Thread.Sleep(TimeSpan.FromSeconds((int)deleteTimer));
-                    msg.DeleteAsync();
+                    await Task.Delay(TimeSpan.FromSeconds((int)deleteTimer));
+                    await msg.DeleteAsync();
                 });
             }
         }
