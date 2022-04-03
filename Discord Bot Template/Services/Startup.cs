@@ -20,7 +20,6 @@ internal class StartupService
         UseSystemClock = false,
         MessageCacheSize = 250,
         UseInteractionSnowflakeDate = true,
-        LogGatewayIntentWarnings = false,
         AlwaysDownloadDefaultStickers = false,
         AlwaysResolveStickers = false,
     });
@@ -29,8 +28,9 @@ internal class StartupService
     {
         var services = new ServiceCollection();
         ConfigureServices(services);
-        var provider = services.BuildServiceProvider();
-        await provider.GetRequiredService<DatabaseContext>().Database.MigrateAsync();
+        ServiceProvider? provider = services.BuildServiceProvider();
+        await using (var databse = new DatabaseContext())
+            await databse.Database.MigrateAsync();
         provider.GetRequiredService<DiscordLogger>();
         await provider.GetRequiredService<InteractionHandler>().InitializeAsync();
         await _client.LoginAsync(TokenType.Bot, "token");
@@ -40,8 +40,7 @@ internal class StartupService
 
     private void ConfigureServices(IServiceCollection services)
     {
-        services.AddDbContext<DatabaseContext>()
-        .AddSingleton(_client)
+        services.AddSingleton(_client)
         .AddSingleton<DiscordLogger>()
         .AddSingleton<Custom>()
         .AddSingleton(new Random())

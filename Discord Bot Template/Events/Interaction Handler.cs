@@ -21,15 +21,15 @@ internal class InteractionHandler
     internal async Task InitializeAsync()
     {
         // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
-        var modules = await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+        IEnumerable<ModuleInfo>? modules = await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         _client.ShardReady += ExecuteOnShardReadyAsync;
         // Process the InteractionCreated payloads to execute Interactions commands
         _client.InteractionCreated += HandleInteractionAsync;
 
         // Process the command execution results 
         _commands.SlashCommandExecuted += SlashCommandExecutedAsync;
-        //_commands.ContextCommandExecuted += ContextCommandExecuted;
-        //_commands.ComponentCommandExecuted += ComponentCommandExecuted;
+        _commands.ContextCommandExecuted += ContextCommandExecutedAsync;
+        _commands.ComponentCommandExecuted += ComponentCommandExecutedAsync;
     }
 
     private async Task ExecuteOnShardReadyAsync(DiscordSocketClient arg) => await _commands.RegisterCommandsGloballyAsync(true);

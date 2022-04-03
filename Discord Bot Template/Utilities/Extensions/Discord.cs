@@ -7,7 +7,7 @@ internal static class DiscordExtensions
 {
     private static Embed MainEmbed(string title, string description, string footer, string footerIcon, string url, string imageUrl, List<EmbedFieldBuilder>? embeds = null)
     {
-        var embed = new EmbedBuilder()
+        EmbedBuilder? embed = new EmbedBuilder()
         {
             Title = title,
             Color = Miscallenous.RandomDiscordColour(),
@@ -36,7 +36,7 @@ internal static class DiscordExtensions
             throw new ArgumentNullException(nameof(shardedContext), "Failed to convert context to a sharded context.");
         }
 
-        var embed = MainEmbed(title, description, $"Issued by: {context.User.Username} | {context.User.Id}", context.User.GetAvatarUrl(), url, imageUrl, embeds);
+        Embed? embed = MainEmbed(title, description, $"Issued by: {context.User.Username} | {context.User.Id}", context.User.GetAvatarUrl(), url, imageUrl, embeds);
 
         if (shardedContext.Interaction.HasResponded)
         {
@@ -67,7 +67,7 @@ internal static class DiscordExtensions
             throw new ArgumentNullException(nameof(textChannel), "Channel was not a text channel");
         }
 
-        var embed = MainEmbed(title, description, footer, footerIcon, url, imageUrl, embeds);
+        Embed? embed = MainEmbed(title, description, footer, footerIcon, url, imageUrl, embeds);
 
         IUserMessage msg = await textChannel.SendMessageAsync(embed: embed);
         try
